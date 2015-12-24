@@ -40,7 +40,7 @@ sub fact ($) {
             } until (isPrime($a));
     }
     my $flag = 1;
-    for (my ($k, $v) = each %hh) {
+    while (my ($k, $v) = each %hh) {
         if ($k != 2 and $v > 1) { $flag = 0 }
     }
     return ($flag, \%hh);
