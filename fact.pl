@@ -4,17 +4,21 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 $|=1;
 
-use Data::Dumper;
-use bigint;
+#use Math::Prime::FastSieve;
+#use Excel::Writer::XLSX;
+require "farrago.pm";
 
-# Usage:
-#   %perl fact.pl 99
-#   %perl fact.pl 1763 4
+# p - модуль(простое число) - генерится из диапазона для входного n
+# n - битность модуля (вход)
+# nq - битность простого делителя qi составного числа Q (Q = q1*q2*...*qm), где Q = p-1
 
-#  2**99 =  633825300114114700748351602688
-# 2**100 = 1267650600228229401496703205376
+isMutuallyCoprime()
+isPairwiseCoprime()
 
-my ($A, $bit) = @ARGV;
+#the pairwise coprime numbers 
+#In mathematics, especially number theory, a set of integers is said to be pairwise coprime (or pairwise relatively prime, also known as mutually coprime) if every pair of integers "a" and "b" in the set are coprime (that is, have no common divisors other than 1)...
+
+#this is simply prototype of factorization into the primes.
 
 sub isPrime ($) {
     my $i = shift;
@@ -26,68 +30,38 @@ sub isPrime ($) {
     return 1;
 }
 
-sub fact ($) {
-    my $n = shift;
-    my $a = 2;
-    my %hh = ();
-    while ($a <= $n) {
-        while ($n % $a == 0) {
-            $n /= $a;
-            $hh{$a}++;
-        }
-        do {
-            $a++
-            } until (isPrime($a));
-    }
-    my $flag = 1;
-    while (my ($k, $v) = each %hh) {
-        if ($k != 2 and $v > 1) { $flag = 0 }
-    }
-    return ($flag, \%hh);
+# linux RHEL 5.6 perl v5.8.8
+# $ C:/Dwimperl/perl/bin/perl -v v5.14.2
+# $ D:/Artem/Perl64/bin/perl.exe -v v5.20.1
+# $ D:/Artem/cygwin64/bin/perl.exe -v v5.14.4
+# use lib "D:/Artem/Perl64/site/lib";
+
+sub gcd ($$) {
+    my ($a, $b) = @_;
+    return $b ? gcd($b, $a%$b) : $a;
 }
 
-my $P = 1;
-my %prime_factors = ();
-my $pi = 3;
+#./primegen-0.97/primes 1 10000000
 
-if ($bit) {
-    $pi = 2 ** ($bit-1);
-    while (! isPrime($pi)) {
-        $pi++
-    }
-}
 
-while ($pi <= $A) {
-    my $q = $pi - 1;
-    my ($flag, $hh) = fact($q);
-    if ($flag) {
-        $P *= $pi;
-        $prime_factors{$pi} = $hh;
-        if ($P >= $A) {
-            last;
-        }
-    }
-    do {
-        $pi++
-        } until (isPrime($pi));
-    if ($bit) {
-        if ($pi >= 2 ** $bit) {
-            print "Warning: Searching for factors with bit length ", $bit + 1, "!\n";
-        }
-        if ($pi >= 2 ** ($bit+1)) {
-            print "Error: There are no factors with bit length $bit and ", $bit + 1, "!\n";
-            last;
-        }
-    }
-}
+getCeilPrime($)
 
-#print Data::Dumper->Dump([\%prime_factors], ["*prime_factors"]);
+getNextPrime()
+getFloorPrime()
+getPrevPrime()
 
-print "A = $A;\n";
-print "P = ", (my $str = join(" * ", sort {$a <=> $b} keys %prime_factors)), " = ", $P, ";\n";
-print "Error: $P=P < A=$A\n" unless ($P >= $A);
-my $i = 0;
-for my $pi (sort {$a <=> $b} keys %prime_factors) {
-    print "q[$i] = $pi - 1 = ", join(" * ", map { $prime_factors{$pi}{$_} > 1 ? "($_**$prime_factors{$pi}{$_})" : "$_" } (sort {$a <=> $b} keys %{$prime_factors{$pi}})), ";\n";
-    $i++;
-}
+my $A = $ARGV[0];
+my $p = getCeilPrime($A); # p >= A
+my $Q = $p - 1;
+my $bw_A = bitWidth($A);
+my $bw_p = bitWidth($p);
+print "Primes in [2;$p]: ", primes(2, $p), "\n";
+
+#sub prepareInput ($$$) {}
+#sub gen_tt($$$) {}
+#sub run_espr($$$) {}
+#sub gen_tt2($$$) {}
+
+# sum_mod3_espr
+# sum_mod3_quine
+# sum_mod3_quine.
